@@ -50,3 +50,16 @@ def start_tunnely(core_obj):
             core_obj._sock.sendto(to_sock, (core_obj._remote_address, core_obj._remote_port))
 
             to_sock = None
+
+if sys.argv[1] == 's':
+    server = core.Core(
+        "10.0.0.1", "24", 32768,
+        "0.0.0.0", 12000, "10.0.0.2",
+        "1200")
+    start_tunnely(server)
+elif sys.argv[1] == 'c':
+    client = core.Core(
+        "10.0.0.2", "24", 32768,
+        "0.0.0.0", 12000, "10.0.0.1",
+        "1200")
+    start_tunnely(client)
