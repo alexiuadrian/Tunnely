@@ -9,7 +9,7 @@ Socket for packet transmission through the TUN interface
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Binding the socket to the TUN device
-sock.bind(('127.0.0.1', 65432))
+sock.bind(('192.168.0.106', 65432))
 
 sock.listen()
 conn, addr = sock.accept()

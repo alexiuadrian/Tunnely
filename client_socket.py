@@ -15,7 +15,7 @@ data = sock.recv(1024)
 
 print(f'Received {repr(data)}')
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Local addr, local port
 # sock.bind(('127.0.0.1', 65535))
