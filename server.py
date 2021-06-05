@@ -72,7 +72,7 @@ while True:
         info_to_tun = None
     
     if info_to_sock and sock in write:
-        sock.sendto(info_to_sock, ('192.168.0.103', 56789))
+        sock.sendto(info_to_sock, (addr[0], 56789))
         print(b"INFO TO SOCK 2 " + info_to_tun)
         info_to_sock = None
 

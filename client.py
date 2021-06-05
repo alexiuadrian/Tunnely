@@ -12,12 +12,12 @@ Socket for packet transmission through the TUN interface
 # Socket initialization
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-sock.bind(('192.168.0.103', 56789))
+sock.bind(('192.168.43.22', 56789))
 
 #sock.connect(('192.168.0.106', 65432))
 
 # sock.sendto(b'Init message', ('192.168.0.106', 65432))
-sock.connect(('192.168.0.106', 65432))
+sock.connect(('79.117.253.249', 65432))
 # print(1)
 # sock.sendall(b'Init')
 # print(2)
@@ -25,6 +25,7 @@ sock.connect(('192.168.0.106', 65432))
 # print(3)
 # print(f'Received {repr(data)}')
 
+subprocess.call(['sysctl', '-w', 'net.ipv4.ip_forward=1'])
 
 tun = pytun.TunTapDevice(flags=pytun.IFF_TAP)
 
@@ -78,7 +79,7 @@ while True:
         info_to_tun = None
     
     if info_to_sock and sock in write:
-        sock.sendto(info_to_sock, ('192.168.0.106', 65432))
+        sock.sendto(info_to_sock, ('79.117.253.249', 65432))
         #sock.sendall(info_to_sock)
         print(b"INFO TO SOCK " + info_to_sock)
         info_to_sock = None
