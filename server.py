@@ -9,11 +9,13 @@ from pytun import IFF_TAP
 info_to_sock = None
 info_to_tun = None
 
+subprocess.call(['iptables', '-t', 'nat', '-A', 'POSTROUTING', '-j', 'MASQUERADE'])
+
 # # Socket initialization
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Binding the socket to the TUN device
-sock.bind(('192.168.0.106', 65432))
+sock.bind(('192.168.0.103', 65432))
 
 sock.listen()
 conn, addr = sock.accept()
@@ -32,6 +34,8 @@ print(f'{addr[0]} has connected!')
 #         break
 #     print(f'Received {repr(data)}')
 #     conn.sendall(data)
+
+# subprocess.call(['sysctl', '-w', 'net.ipv4.ip_forward=1'])
 
 tun = pytun.TunTapDevice(flags=IFF_TAP)
 
@@ -57,7 +61,7 @@ while True:
 
     if tun in read:
         info_to_sock = tun.read(tun.mtu)
-        # print(b"INFO TO SOCK 1 " + info_to_sock)
+        print(b"INFO TO SOCK 1 " + info_to_sock)
     
     if sock in read:
         # info_to_tun, addr = sock.listen()
@@ -72,7 +76,7 @@ while True:
         info_to_tun = None
     
     if info_to_sock and sock in write:
-        sock.sendto(info_to_sock, ('192.168.0.103', 56789))
+        sock.sendto(info_to_sock, (addr[0], 56789))
         print(b"INFO TO SOCK 2 " + info_to_tun)
         info_to_sock = None
 
