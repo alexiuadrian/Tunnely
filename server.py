@@ -10,6 +10,7 @@ import struct
 import fcntl
 import sys
 from cryptography.fernet import Fernet
+import base64 as b64encode
 
 
 def read_key_from_file(path_to_key):
@@ -17,6 +18,7 @@ def read_key_from_file(path_to_key):
     
     content = f.read()
     
+    #return b64encode.urlsafe_b64encode(str.encode(content))
     return str.encode(content)
 
 path_to_key = sys.argv[1]
@@ -26,6 +28,7 @@ remote_ip = sys.argv[4]
 remote_port = int(sys.argv[5])
 
 key = read_key_from_file(path_to_key)
+print(key)
 info_to_sock = None
 info_to_tap = None
 
