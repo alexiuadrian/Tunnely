@@ -8,6 +8,7 @@ import struct
 import fcntl    
 import sys
 from cryptography.fernet import Fernet
+import base64 as b64encode
 
 
 def read_key_from_file(path_to_key):
@@ -15,6 +16,7 @@ def read_key_from_file(path_to_key):
     
     content = f.read()
     
+    # return b64encode.urlsafe_b64encode(str.encode(content))
     return str.encode(content)
 
 # Command line arguments from the tunnely bash script
@@ -26,6 +28,7 @@ remote_port = int(sys.argv[5])
     
 
 key = read_key_from_file(path_to_key)
+print(key)
 
 '''
 Socket for packet transmission through the TUN interface
