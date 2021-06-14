@@ -5,8 +5,15 @@ import select
 from pytun import IFF_TAP
 import os
 import struct
-import fcntl
-#import pynetlinux
+import fcntl    
+import sys
+
+# Command line arguments from the tunnely bash script
+path_to_key = sys.argv[1]
+local_ip = sys.argv[2]
+local_port = int(sys.argv[3])
+remote_ip = sys.argv[4]
+remote_port = int(sys.argv[5])
 
 '''
 Socket for packet transmission through the TUN interface
@@ -20,7 +27,7 @@ Socket for packet transmission through the TUN interface
 # Socket initialization
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-sock.bind(('192.168.0.106', 56789))
+sock.bind((local_ip, local_port))
 
 #sock.connect(('192.168.0.106', 65432))
 
@@ -36,14 +43,14 @@ sock.bind(('192.168.0.106', 56789))
 
 # subprocess.call(['sysctl', '-w', 'net.ipv4.ip_forward=1'])
 
-tun = pytun.TunTapDevice(flags=pytun.IFF_TAP)
+tap = pytun.TunTapDevice(flags=pytun.IFF_TAP)
 
-tun.addr = '10.8.0.2'
-tun.netmask = '255.255.255.0'
-tun.mtu = 1500
+tap.addr = '10.8.0.2'
+tap.netmask = '255.255.255.0'
+tap.mtu = 1500
 
 # # Starting the TUN interface
-tun.up()
+tap.up()
 
 # print(f'The device {tun.name} is up!')
 
@@ -70,34 +77,34 @@ Socket for packet transmission through the TUN interface
 # tun.persist(True)
 
 info_to_sock = None
-info_to_tun = None
-devices = [tun, sock]
+info_to_tap = None
+devices = [tap, sock]
 
 while True:
     read, write, x = select.select(devices, devices, [])
 
-    if tun in read:
+    if tap in read:
         # info_to_sock = tun.read(tun.mtu)
         #info_to_sock = os.read(tun, 1500)
+        info_to_sock = tap.read(1500)
         print(b"INFO TO SOCK 1", info_to_sock)
-        info_to_sock = tun.read(1500)
     
     if sock in read:
         # sock.listen()
         # info_to_tun, addr = sock.accept()
         #info_to_tun, addr = sock.recvfrom(65432)
-        print(b"INFO TO TUN 1", info_to_tun)
-        info_to_tun, ad = sock.recvfrom(65432)
+        info_to_tap, ad = sock.recvfrom(65432)
+        print(b"INFO TO TAP 1", info_to_tap)
     
-    if info_to_tun and tun in write:
+    if info_to_tap and tap in write:
         # tun.write(info_to_tun)
         #os.write(tun, info_to_tun)
-        print(b"INFO TO TUN 2", info_to_tun)
-        tun.write(info_to_tun)
-        info_to_tun = None
+        tap.write(info_to_tap)
+        info_to_tap = None
+        print(b"INFO TO TAP 2", info_to_tap)
     
     if info_to_sock and sock in write:
-        sock.sendto(info_to_sock, ('79.117.253.249', 65432))
+        sock.sendto(info_to_sock, (remote_ip, remote_port))
         #sock.sendall(info_to_sock)
         print(b"INFO TO SOCK 2", info_to_sock)
         info_to_sock = None

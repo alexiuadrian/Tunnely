@@ -52,26 +52,26 @@ then
     exit;
 fi
 
+# Checking if the remote ip address has been set
+if [ -z $remote_ip ];
+then
+    # If it hasn't, the script ends
+    echo "Please specify the remote IP address of the other end with the -i option. (Make sure it is in the right format)";
+    exit;
+fi
+
+# Checking if the remote port has been set
+if [ -z $remote_port ];
+then
+    # If it hasn't, the script ends
+    echo "Please specify the remote port of the other end with the -p option. (Make sure it is in the right format)";
+    exit;
+fi
+
 # We check what mode Tunnely is running in
 if [ $mode = "C" ]; 
 then 
     echo "Tunnely will run as a client"
-
-    # Checking if the remote ip address has been set
-    if [ -z $remote_ip ];
-    then
-        # If it hasn't, the script ends
-        echo "Please specify the remote IP address of the server with the -i option. (Make sure it is in the right format)";
-        exit;
-    fi
-
-    # Checking if the remote port has been set
-    if [ -z $remote_port ];
-    then
-        # If it hasn't, the script ends
-        echo "Please specify the remote port of the server with the -p option. (Make sure it is in the right format)";
-        exit;
-    fi
 
     echo "$key_path";
     echo "$remote_ip";
@@ -79,17 +79,17 @@ then
     echo "$local_port";
     echo "$local_ip";
 
-    sudo ./client.py $key_path $local_ip $local_port $remote_ip $remote_port
+    sudo python3 client.py $key_path $local_ip $local_port $remote_ip $remote_port
 
 elif [ $mode = "S" ];
 then 
     echo "Tunnely will run as a server"
     
-    echo "$key_path";
-    echo "$local_port";
-    echo "$local_ip";
+    # echo "$key_path";
+    # echo "$local_port";
+    # echo "$local_ip";
 
-    sudo ./server.py $key_path $local_ip $local_port
+    sudo python3 server.py $key_path $local_ip $local_port $remote_ip $remote_port
 else 
     echo "Wrong mode. Please specify the way Tunnely will run. (C for client or S for server)"
 fi
