@@ -15,7 +15,9 @@ from cryptography.fernet import Fernet
 def read_key_from_file(path_to_key):
     f = open(path_to_key, "r")
     
-    return str(f.read())
+    content = f.read()
+    
+    return str.encode(content)
 
 path_to_key = sys.argv[1]
 local_ip = sys.argv[2]
@@ -40,6 +42,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Binding the socket to the local computer
 sock.bind((local_ip, local_port))
+
+# sock.listen(local_port)
 
 '''
 Creating the TAP interface
@@ -67,9 +71,11 @@ while True:
         info_to_tap, ad = sock.recvfrom(remote_port)
         
         f = Fernet(key)
-        info_to_tap = f.decrypt(info_to_tap)
+        decr_info_to_tap = f.decrypt(info_to_tap)
         
-        print("INFO TO TAP 1 ", info_to_tap)
+        print("INFO TO TAP 1 ", decr_info_to_tap)
+        
+        info_to_tap = decr_info_to_tap
     
     if info_to_tap and tap in write:
         
@@ -85,5 +91,4 @@ while True:
         encr_info_to_sock = f.encrypt(info_to_sock)
         info_to_sock = None
         
-        sock.sendto(info_to_sock, (remote_ip, remote_port))
-        
+        sock.sendto(encr_info_to_sock, (remote_ip, remote_port))
