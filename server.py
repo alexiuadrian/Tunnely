@@ -1,16 +1,11 @@
 from os import sendfile
 import pytun
-import time
 import socket
-import subprocess
 import select
 from pytun import IFF_TAP
 import os
-import struct
-import fcntl
 import sys
 from cryptography.fernet import Fernet
-import base64 as b64encode
 
 
 def read_key_from_file(path_to_key):
@@ -18,7 +13,6 @@ def read_key_from_file(path_to_key):
     
     content = f.read()
     
-    #return b64encode.urlsafe_b64encode(str.encode(content))
     return str.encode(content)
 
 path_to_key = sys.argv[1]
@@ -32,7 +26,7 @@ print(key)
 info_to_sock = None
 info_to_tap = None
 
-os.system('sudo sysctl -w net.ipv4.ip_forward=1')
+os.system('sysctl -w net.ipv4.ip_forward=1')
 
 os.system('sudo iptables -t nat -A POSTROUTING -j MASQUERADE')
 
@@ -68,7 +62,7 @@ while True:
 
     if tap in read:
         info_to_sock = tap.read(1500)
-        print("INFO TO SOCK 1 ", info_to_sock)
+        #print("INFO TO SOCK 1 ", info_to_sock)
     
     if sock in read:        
         info_to_tap, ad = sock.recvfrom(remote_port)
@@ -76,18 +70,18 @@ while True:
         f = Fernet(key)
         decr_info_to_tap = f.decrypt(info_to_tap)
         
-        print("INFO TO TAP 1 ", decr_info_to_tap)
+        #print("INFO TO TAP 1 ", decr_info_to_tap)
         
         info_to_tap = decr_info_to_tap
     
     if info_to_tap and tap in write:
         
         tap.write(info_to_tap)
-        print("INFO TO TAP 2 ", info_to_tap)
+        #print("INFO TO TAP 2 ", info_to_tap)
         info_to_tap = None
     
     if info_to_sock and sock in write:
-        print("INFO TO SOCK 2 ", info_to_sock)
+        #print("INFO TO SOCK 2 ", info_to_sock)
         
         f = Fernet(key)
         
